@@ -6,7 +6,7 @@ Requires:
  * Eet 1.7.x or greater
 
 To build:
-    cd php_eet
-    phpize
-    ./configure
-    make
+ * cd php_eet
+ * phpize
+ * ./configure
+ * make
