@@ -10,3 +10,6 @@ To build:
  * phpize
  * ./configure
  * make
+
+To test:
+ * php -dextension=modules/eet.so example.php

@@ -17,6 +17,8 @@ extern zend_module_entry eet_module_entry;
 #include "TSRM.h"
 #endif
 
+#define PHP_EET_EET_FILE "Eet_File"
+
 PHP_MINIT_FUNCTION(eet);
 PHP_MSHUTDOWN_FUNCTION(eet);
 PHP_RINIT_FUNCTION(eet);
@@ -24,6 +26,10 @@ PHP_RSHUTDOWN_FUNCTION(eet);
 PHP_MINFO_FUNCTION(eet);
 
 PHP_FUNCTION(confirm_eet_compiled);	/* For testing, remove later. */
+
+PHP_FUNCTION(eet_open);
+PHP_FUNCTION(eet_close);
+PHP_FUNCTION(eet_file_get);
 
 /* 
   	Declare any global variables you may need between the BEGIN

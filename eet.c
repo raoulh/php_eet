@@ -8,8 +8,13 @@
 
 #include <Eet.h>
 
+int le_eet_file;
+
 const zend_function_entry eet_functions[] = {
 	PHP_FE(confirm_eet_compiled,	NULL)		/* For testing, remove later. */
+	PHP_FE(eet_open, NULL)
+	PHP_FE(eet_close, NULL)
+	PHP_FE(eet_file_get, NULL)
 	PHP_FE_END	/* Must be the last line in eet_functions[] */
 };
 
@@ -36,6 +41,9 @@ ZEND_GET_MODULE(eet)
 
 PHP_MINIT_FUNCTION(eet)
 {
+	le_eet_file = zend_register_list_destructors_ex(NULL, NULL, 
+					PHP_EET_EET_FILE, module_number);
+
 	eet_init();
 	return SUCCESS;
 }
@@ -88,6 +96,83 @@ PHP_FUNCTION(confirm_eet_compiled)
    function definition, where the functions purpose is also documented. Please 
    follow this convention for the convenience of others editing your code.
 */
+
+
+PHP_FUNCTION(eet_open)
+{
+	Eet_File *ef = NULL;
+	char *fname;
+	int fname_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &fname, &fname_len) == FAILURE)
+	{
+		RETURN_FALSE;
+	}
+
+	if (fname_len < 1)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "No filename given!");
+		RETURN_FALSE;
+	}
+
+	ef = eet_open(fname, EET_FILE_MODE_READ_WRITE);
+
+	if (!ef)
+	{
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "eet_open failed!");
+		RETURN_FALSE;
+	}
+
+	ZEND_REGISTER_RESOURCE(return_value, ef, le_eet_file);
+}
+
+
+PHP_FUNCTION(eet_close)
+{
+	Eet_File *ef = NULL;
+	zval *zef;
+	Eet_Error ret;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &zef) == FAILURE)
+	{
+		RETURN_FALSE;
+	}
+
+	ZEND_FETCH_RESOURCE(ef, Eet_File *, &zef, -1, PHP_EET_EET_FILE, le_eet_file);
+
+	ret = eet_close(ef);
+
+	if (ret == EET_ERROR_NONE)
+	{
+		RETURN_TRUE;
+	}
+
+	RETURN_LONG((long)ret);
+}
+
+PHP_FUNCTION(eet_file_get)
+{
+	Eet_File *ef = NULL;
+	zval *zef;
+	Eet_Error ret;
+	const char *fname;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &zef) == FAILURE)
+	{
+		RETURN_FALSE;
+	}
+
+	ZEND_FETCH_RESOURCE(ef, Eet_File *, &zef, -1, PHP_EET_EET_FILE, le_eet_file);
+
+	fname = eet_file_get(ef);
+
+	if (!fname)
+	{
+		RETURN_FALSE;
+	}
+
+	RETURN_STRING(fname, 0);
+}
 
 
 /*
