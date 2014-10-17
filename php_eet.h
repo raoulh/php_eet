@@ -29,6 +29,7 @@ PHP_FUNCTION(eet_open);
 PHP_FUNCTION(eet_close);
 PHP_FUNCTION(eet_file_get);
 PHP_FUNCTION(eet_list);
+PHP_FUNCTION(eet_data_write);
 
 /*
         Declare any global variables you may need between the BEGIN

@@ -33,43 +33,71 @@
 
         unset($list);
 
-    //setup an Eet_Data_Descriptor here
-    /*
-        similar to C struct:
+        //setup an Eet_Data_Descriptor here
+        /*
+                similar to C struct:
 
-        struct
-        {
-            int version;
-            char *name;
-            int id;
-            double value;
-        }
-    */
-/*
-    $edd = array (
-        "version" => EET_T_INT,
-        "name" => EET_T_STRING,
-        "id" => EET_T_INT,
-        "value" => EET_T_DOUBLE,
-    );
+                struct data
+                {
+                        int version;
+                        char *name;
+                        int id;
+                        double value;
+                        Eina_List *list;  //list of char *
+                        Eina_Hash *subhash;  //new hashtable
 
-    $data = array (
-        "version" => 1,
-        "name" => "name of data",
-        "id" => 123,
-        "value" => 3.14,
-    );
+                        Eina_List *sublist; //list of sub_data
+                };
 
-    eet_data_write($f, $edd, "my_entry", $data, true);
+                struct sub_data
+                {
+                        int subversion;
+                        char *subname;
+                        int subid;
+                }
+        */
 
-    eet_sync($f);
+        $edd = array (
+                EET_G_HASH //this is a hashtable
+                "version" => EET_T_INT,
+                "name" => EET_T_STRING,
+                "id" => EET_T_INT,
+                "value" => EET_T_DOUBLE,
+                "list" => array(
+                        EET_G_LIST, //list of element
+                        EET_T_STRING, //list of string
+                ),
+                "subhash" => array (
+                        EET_G_HASH, //this is a sub hashtable
+                        "subversion" => EET_T_INT,
+                        "subname" => EET_T_STRING,
+                        "subid" => EET_T_INT
+                )
+        );
 
-    $my_data = eet_data_read($f, $edd, "my_entry");
+        $data = array (
+                "version" => 1,
+                "name" => "name of data",
+                "id" => 123,
+                "value" => 3.14,
+                "list" => array (
+                        "data1",
+                        "data2",
+                        "data3",
+                ),
+        );
 
-    var_dump($my_data);
+        print("Write some data to test.eet\n");
+        $f = eet_open("test.eet", EET_FILE_MODE_WRITE);
+        eet_data_write($f, "struct_name", $edd, "my_entry", $data, true);
+        eet_close($f);
 
-*/
-    eet_close($f);
+        //eet_sync($f);
 
+        //$my_data = eet_data_read($f, $edd, "my_entry");
+
+        //var_dump($my_data);
+
+        eet_close($f);
 
 ?>
